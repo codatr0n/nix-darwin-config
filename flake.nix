@@ -12,8 +12,15 @@
     configuration = { pkgs, ... }: {
       # List packages installed in system profile. To search by name, run:
       # $ nix-env -qaP | grep wget
+
+
+
       environment.systemPackages = with pkgs;
         [
+          # desktop applications
+          google-chrome
+
+
           # essenstials
           wget
           bat
@@ -109,7 +116,11 @@
       nix.enable = false;
 
       # Necessary for using flakes on this system.
-      nix.settings.experimental-features = "nix-command flakes";
+      nix.settings = {
+        experimental-features = ["nix-command" "flakes"];
+        warn-dirty = false;
+        auto-optimise-store = true;
+      };
 
       # Enable alternative shell support in nix-darwin.
       # programs.fish.enable = true;
@@ -123,13 +134,19 @@
 
       # The platform the configuration will be used on.
       nixpkgs.hostPlatform = "aarch64-darwin";
+
+      # allow proprietary software
+      nixpkgs.config.allowUnfree = true;
     };
   in
   {
     # Build darwin flake using:
     # $ darwin-rebuild build --flake .#simple
     darwinConfigurations."DK-QG61VFMVW7" = nix-darwin.lib.darwinSystem {
-      modules = [ configuration ];
+
+      modules = [
+        configuration
+      ];
     };
   };
 }
