@@ -2,12 +2,25 @@
   description = "Eriks nix-darwin system flake";
 
   inputs = {
-    nixpkgs.url = "github:NixOS/nixpkgs/nixpkgs-unstable";
-    nix-darwin.url = "github:nix-darwin/nix-darwin/master";
+    nixpkgs.url = "github:NixOS/nixpkgs/nixos-24.11";
+    nixpkgs-unstable.url = "github:nixos/nixpkgs/nixos-unstable";
+
+    nix-darwin.url = "github:nix-darwin/nix-darwin/nix-darwin-24.11";
     nix-darwin.inputs.nixpkgs.follows = "nixpkgs";
+
+    # nix-homebrew.url = "github:zhaofengli-wip/nix-homebrew";
+    # homebrew-core = { url = "github:homebrew/homebrew-core"; flake = false; };
+    # homebrew-cask = { url = "github:homebrew/homebrew-cask"; flake = false; };
+    # homebrew-bundle = { url = "github:homebrew/homebrew-bundle"; flake = false; };
+
+    # home-manager.url = "github:nix-community/home-manager/release-24.11";
+    # home-manager.inputs.nixpkgs.follows = "nixpkgs";
   };
 
-  outputs = inputs@{ self, nix-darwin, nixpkgs }:
+  outputs = { self, nixpkgs, nixpkgs-unstable, nix-darwin, ... }:
+  let
+    pkgs = nixpkgs.legacyPackages.aarch64-darwin;
+  in
   let
     configuration = { pkgs, ... }: {
       # List packages installed in system profile. To search by name, run:
@@ -24,7 +37,7 @@
           # essenstials
           wget
           bat
-          usbutils
+        #   usbutils # doesnt work on arm?
           pciutils
           iperf3
           jq
@@ -63,17 +76,28 @@
           jetbrains-mono
           julia-mono
 
-          nerd-fonts.jetbrains-mono
-          nerd-fonts.fira-code
-          nerd-fonts.iosevka
-          nerd-fonts.hack
-          nerd-fonts.meslo-lg
-          nerd-fonts.terminess-ttf
-          nerd-fonts.inconsolata
+          (nerdfonts.override { fonts = [
+            "JetBrainsMono"
+            "FiraCode"
+            "Iosevka"
+            "Hack"
+            "Meslo"
+            # "TerminessTTF"
+            "Inconsolata"
+            ]; }
+          )
+        #   nerd-fonts.jetbrains-mono
+        #   nerd-fonts.fira-code
+        #   nerd-fonts.iosevka
+        #   nerd-fonts.hack
+        #   nerd-fonts.meslo-lg
+        #   nerd-fonts.terminess-ttf
+        #   nerd-fonts.inconsolata
       ];
 
       # Unlocking sudo via fingerprint
-      security.pam.services.sudo_local.touchIdAuth = true;
+    #   security.pam.services.sudo_local.touchIdAuth = true;
+      security.pam.enableSudoTouchIdAuth = true;
 
       # System defaults
       system.defaults = {
@@ -113,14 +137,16 @@
       # To turn off nix-darwin’s management of the Nix installation, set:
       # nix.enable = false;
       # This will allow you to use nix-darwin with Determinate
-      nix.enable = false;
+      nix.enable = true;
 
       # Necessary for using flakes on this system.
       nix.settings = {
         experimental-features = ["nix-command" "flakes"];
         warn-dirty = false;
-        auto-optimise-store = true;
+        # auto-optimise-store = true;
       };
+
+      nix.optimise.automatic = true;
 
       # Enable alternative shell support in nix-darwin.
       # programs.fish.enable = true;
@@ -130,18 +156,21 @@
 
       # Used for backwards compatibility, please read the changelog before changing.
       # $ darwin-rebuild changelog
-      system.stateVersion = 6;
+      system.stateVersion = 1;
 
       # The platform the configuration will be used on.
       nixpkgs.hostPlatform = "aarch64-darwin";
 
       # allow proprietary software
       nixpkgs.config.allowUnfree = true;
+
+      # allow packages for unsupported architectures
+      nixpkgs.config.allowUnsupportedSystem = true;
     };
   in
   {
-    # Build darwin flake using:
-    # $ darwin-rebuild build --flake .#simple
+    # packages.aarch64-darwin.default = nixpkgs.legacyPackages.aarch64-darwin.hello;
+    # defaultPackage.aarch64-darwin = pkgs.hello;
     darwinConfigurations."DK-QG61VFMVW7" = nix-darwin.lib.darwinSystem {
 
       modules = [
