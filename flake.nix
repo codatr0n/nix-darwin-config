@@ -2,10 +2,10 @@
   description = "Eriks nix-darwin system flake";
 
   inputs = {
-    nixpkgs.url = "github:NixOS/nixpkgs/nixos-24.11";
+    nixpkgs.url = "github:NixOS/nixpkgs/nixpkgs-unstable";
     nixpkgs-unstable.url = "github:nixos/nixpkgs/nixos-unstable";
 
-    nix-darwin.url = "github:nix-darwin/nix-darwin/nix-darwin-24.11";
+    nix-darwin.url = "github:nix-darwin/nix-darwin/master";
     nix-darwin.inputs.nixpkgs.follows = "nixpkgs";
 
     # nix-homebrew.url = "github:zhaofengli-wip/nix-homebrew";
@@ -26,18 +26,14 @@
       # List packages installed in system profile. To search by name, run:
       # $ nix-env -qaP | grep wget
 
-
-
       environment.systemPackages = with pkgs;
         [
           # desktop applications
           google-chrome
 
-
           # essenstials
           wget
           bat
-        #   usbutils # doesnt work on arm?
           pciutils
           iperf3
           jq
@@ -62,9 +58,11 @@
           bottom
 
           # development
-          gh
           git
+          gh            # GitHub CLI
+          glab         # GitLab CLI
           opentofu
+          hcloud        # Hetzner Cloud CLI
         ];
 
       fonts.packages = with pkgs; [
@@ -76,28 +74,20 @@
           jetbrains-mono
           julia-mono
 
-          (nerdfonts.override { fonts = [
-            "JetBrainsMono"
-            "FiraCode"
-            "Iosevka"
-            "Hack"
-            "Meslo"
-            # "TerminessTTF"
-            "Inconsolata"
-            ]; }
-          )
-        #   nerd-fonts.jetbrains-mono
-        #   nerd-fonts.fira-code
-        #   nerd-fonts.iosevka
-        #   nerd-fonts.hack
-        #   nerd-fonts.meslo-lg
-        #   nerd-fonts.terminess-ttf
-        #   nerd-fonts.inconsolata
+          nerd-fonts.jetbrains-mono
+          nerd-fonts.fira-code
+          nerd-fonts.iosevka
+          nerd-fonts.hack
+          nerd-fonts.meslo-lg
+          nerd-fonts.inconsolata
       ];
 
       # Unlocking sudo via fingerprint
     #   security.pam.services.sudo_local.touchIdAuth = true;
-      security.pam.enableSudoTouchIdAuth = true;
+      security.pam.services.sudo_local.touchIdAuth = true;
+
+      # Set the primary user for system defaults
+      system.primaryUser = "Erik.kiebe";
 
       # System defaults
       system.defaults = {
@@ -137,13 +127,16 @@
       # To turn off nix-darwin’s management of the Nix installation, set:
       # nix.enable = false;
       # This will allow you to use nix-darwin with Determinate
-      nix.enable = true;
+      nix.enable = true;      # Fix GID mismatch for nixbld group
+      ids.gids.nixbld = 350;
 
       # Necessary for using flakes on this system.
       nix.settings = {
         experimental-features = ["nix-command" "flakes"];
         warn-dirty = false;
         # auto-optimise-store = true;
+        download-buffer-size = 134217728; # 128 MB (default is 64 MB)
+
       };
 
       nix.optimise.automatic = true;
@@ -156,7 +149,7 @@
 
       # Used for backwards compatibility, please read the changelog before changing.
       # $ darwin-rebuild changelog
-      system.stateVersion = 1;
+      system.stateVersion = 2;
 
       # The platform the configuration will be used on.
       nixpkgs.hostPlatform = "aarch64-darwin";
