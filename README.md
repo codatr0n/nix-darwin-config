@@ -8,6 +8,7 @@ My personal Nix configuration for macOS
 - https://github.com/dustinlyons/nixos-config
 - https://davi.sh/blog/2024/02/nix-home-manager/
 - https://davi.sh/blog/2024/11/nix-vscode/
+- https://github.com/davish/nix-on-mac/blob/part-3/flake.nix
 
 
 #### NixOS links
