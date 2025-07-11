@@ -3,21 +3,37 @@
 
   inputs = {
     nixpkgs.url = "github:NixOS/nixpkgs/nixpkgs-unstable";
+    nixpkgs-unstable.url = "github:nixos/nixpkgs/nixos-unstable";
+
     nix-darwin.url = "github:nix-darwin/nix-darwin/master";
     nix-darwin.inputs.nixpkgs.follows = "nixpkgs";
+
+    # nix-homebrew.url = "github:zhaofengli-wip/nix-homebrew";
+    # homebrew-core = { url = "github:homebrew/homebrew-core"; flake = false; };
+    # homebrew-cask = { url = "github:homebrew/homebrew-cask"; flake = false; };
+    # homebrew-bundle = { url = "github:homebrew/homebrew-bundle"; flake = false; };
+
+    # home-manager.url = "github:nix-community/home-manager/release-24.11";
+    # home-manager.inputs.nixpkgs.follows = "nixpkgs";
   };
 
-  outputs = inputs@{ self, nix-darwin, nixpkgs }:
+  outputs = { self, nixpkgs, nixpkgs-unstable, nix-darwin, ... }:
+  let
+    pkgs = nixpkgs.legacyPackages.aarch64-darwin;
+  in
   let
     configuration = { pkgs, ... }: {
       # List packages installed in system profile. To search by name, run:
       # $ nix-env -qaP | grep wget
+
       environment.systemPackages = with pkgs;
         [
+          # desktop applications
+          google-chrome
+
           # essenstials
           wget
           bat
-          usbutils
           pciutils
           iperf3
           jq
@@ -42,9 +58,11 @@
           bottom
 
           # development
-          gh
           git
+          gh            # GitHub CLI
+          glab         # GitLab CLI
           opentofu
+          hcloud        # Hetzner Cloud CLI
         ];
 
       fonts.packages = with pkgs; [
@@ -61,12 +79,15 @@
           nerd-fonts.iosevka
           nerd-fonts.hack
           nerd-fonts.meslo-lg
-          nerd-fonts.terminess-ttf
           nerd-fonts.inconsolata
       ];
 
       # Unlocking sudo via fingerprint
+    #   security.pam.services.sudo_local.touchIdAuth = true;
       security.pam.services.sudo_local.touchIdAuth = true;
+
+      # Set the primary user for system defaults
+      system.primaryUser = "Erik.kiebe";
 
       # System defaults
       system.defaults = {
@@ -106,10 +127,19 @@
       # To turn off nix-darwin’s management of the Nix installation, set:
       # nix.enable = false;
       # This will allow you to use nix-darwin with Determinate
-      nix.enable = false;
+      nix.enable = true;      # Fix GID mismatch for nixbld group
+      ids.gids.nixbld = 350;
 
       # Necessary for using flakes on this system.
-      nix.settings.experimental-features = "nix-command flakes";
+      nix.settings = {
+        experimental-features = ["nix-command" "flakes"];
+        warn-dirty = false;
+        # auto-optimise-store = true;
+        download-buffer-size = 134217728; # 128 MB (default is 64 MB)
+
+      };
+
+      nix.optimise.automatic = true;
 
       # Enable alternative shell support in nix-darwin.
       # programs.fish.enable = true;
@@ -119,17 +149,26 @@
 
       # Used for backwards compatibility, please read the changelog before changing.
       # $ darwin-rebuild changelog
-      system.stateVersion = 6;
+      system.stateVersion = 2;
 
       # The platform the configuration will be used on.
       nixpkgs.hostPlatform = "aarch64-darwin";
+
+      # allow proprietary software
+      nixpkgs.config.allowUnfree = true;
+
+      # allow packages for unsupported architectures
+      nixpkgs.config.allowUnsupportedSystem = true;
     };
   in
   {
-    # Build darwin flake using:
-    # $ darwin-rebuild build --flake .#simple
+    # packages.aarch64-darwin.default = nixpkgs.legacyPackages.aarch64-darwin.hello;
+    # defaultPackage.aarch64-darwin = pkgs.hello;
     darwinConfigurations."DK-QG61VFMVW7" = nix-darwin.lib.darwinSystem {
-      modules = [ configuration ];
+
+      modules = [
+        configuration
+      ];
     };
   };
 }
