@@ -3,8 +3,6 @@
 
   inputs = {
     nixpkgs.url = "github:NixOS/nixpkgs/nixpkgs-unstable";
-    nixpkgs-unstable.url = "github:nixos/nixpkgs/nixos-unstable";
-
     nix-darwin.url = "github:nix-darwin/nix-darwin/master";
     nix-darwin.inputs.nixpkgs.follows = "nixpkgs";
 
@@ -17,12 +15,12 @@
     # home-manager.inputs.nixpkgs.follows = "nixpkgs";
   };
 
-  outputs = { self, nixpkgs, nixpkgs-unstable, nix-darwin, ... }:
+  outputs = { self, nixpkgs, nix-darwin, ... }:
   let
     pkgs = nixpkgs.legacyPackages.aarch64-darwin;
   in
   let
-    configuration = { pkgs, ... }: {
+    configuration = { pkgs, lib, ... }: {
       # List packages installed in system profile. To search by name, run:
       # $ nix-env -qaP | grep wget
 
@@ -73,24 +71,39 @@
           fira-code-symbols
           jetbrains-mono
           julia-mono
-
-          nerd-fonts.jetbrains-mono
-          nerd-fonts.fira-code
-          nerd-fonts.iosevka
-          nerd-fonts.hack
-          nerd-fonts.meslo-lg
-          nerd-fonts.inconsolata
       ];
 
-      # Unlocking sudo via fingerprint
-    #   security.pam.services.sudo_local.touchIdAuth = true;
-      security.pam.services.sudo_local.touchIdAuth = true;
+      # Don't manage PAM files (managed by IT)
+      system.activationScripts.pam.text = lib.mkForce "";
 
       # Set the primary user for system defaults
       system.primaryUser = "Erik.kiebe";
 
       # System defaults
       system.defaults = {
+        NSGlobalDomain = {
+          # Keyboard responsiveness
+          InitialKeyRepeat = 10;
+          KeyRepeat = 1;
+          ApplePressAndHoldEnabled = false;
+
+          # Disable smart text substitutions
+          NSAutomaticCapitalizationEnabled = false;
+          NSAutomaticDashSubstitutionEnabled = false;
+          NSAutomaticPeriodSubstitutionEnabled = false;
+          NSAutomaticQuoteSubstitutionEnabled = false;
+          NSAutomaticSpellingCorrectionEnabled = false;
+
+          # Better defaults
+          AppleShowAllExtensions = true;
+          NSDocumentSaveNewDocumentsToCloud = false;
+          NSNavPanelExpandedStateForSaveMode = true;
+          PMPrintingExpandedStateForPrint = true;
+
+          # Faster UI
+          NSAutomaticWindowAnimationsEnabled = false;
+        };
+
         dock = {
             autohide = true;
             magnification = false;
@@ -135,8 +148,22 @@
         experimental-features = ["nix-command" "flakes"];
         warn-dirty = false;
         # auto-optimise-store = true;
-        download-buffer-size = 134217728; # 128 MB (default is 64 MB)
 
+        # Binary caches for faster downloads
+        substituters = [
+          "https://cache.nixos.org"  # Default cache
+          "https://nix-community.cachix.org"
+        ];
+
+        trusted-public-keys = [
+          "cache.nixos.org-1:6NCHdD59X431o0gWypbMrAURkbJ16ZPMQFGspcDShjY="
+          "nix-community.cachix.org-1:mB9FSh9qf2dCimDSUo8Zy7bkq5CX+/rkCWyvRCYg3Fs="
+        ];
+
+        # Performance optimizations
+        http-connections = 128;
+        max-jobs = "auto";
+        download-buffer-size = 134217728; # 128 MB (default is 64 MB)
       };
 
       nix.optimise.automatic = true;
@@ -149,7 +176,11 @@
 
       # Used for backwards compatibility, please read the changelog before changing.
       # $ darwin-rebuild changelog
-      system.stateVersion = 2;
+
+      system.stateVersion = 5;
+
+      # Primary user for user-specific settings
+      system.primaryUser = "Erik.kiebe";
 
       # The platform the configuration will be used on.
       nixpkgs.hostPlatform = "aarch64-darwin";

@@ -41,8 +41,14 @@ Reload your terminal to use the new shell.
 
 #### subsequent rebuilds with nix-darwin
 ```bash
-darwin-rebuild switch --flake .
+sudo darwin-rebuild switch --flake .
 ```
+or use the convenience script:
+```bash
+sudo ./rebuild.sh
+```
+
+**Note**: Must use `sudo` - nix-darwin master requires root for system activation.
 
 
 #### uninstall nix-darwin
