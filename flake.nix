@@ -24,18 +24,14 @@
       # List packages installed in system profile. To search by name, run:
       # $ nix-env -qaP | grep wget
 
-
-
       environment.systemPackages = with pkgs;
         [
           # desktop applications
           google-chrome
 
-
           # essenstials
           wget
           bat
-        #   usbutils # doesnt work on arm?
           pciutils
           iperf3
           jq
@@ -60,23 +56,28 @@
           bottom
 
           # development
-          gh
           git
+          gh            # GitHub CLI
+          glab         # GitLab CLI
           opentofu
+          hcloud        # Hetzner Cloud CLI
         ];
 
       fonts.packages = with pkgs; [
           # developers fonts
-          nerd-fonts.jetbrains-mono
-          nerd-fonts.fira-code
-          nerd-fonts.iosevka
-          nerd-fonts.hack
-          nerd-fonts.meslo-lg
-          nerd-fonts.inconsolata
+          dina-font
+          fira
+          fira-code
+          fira-code-symbols
+          jetbrains-mono
+          julia-mono
       ];
 
       # Don't manage PAM files (managed by IT)
       system.activationScripts.pam.text = lib.mkForce "";
+
+      # Set the primary user for system defaults
+      system.primaryUser = "Erik.kiebe";
 
       # System defaults
       system.defaults = {
@@ -139,7 +140,8 @@
       # To turn off nix-darwin’s management of the Nix installation, set:
       # nix.enable = false;
       # This will allow you to use nix-darwin with Determinate
-      nix.enable = true;
+      nix.enable = true;      # Fix GID mismatch for nixbld group
+      ids.gids.nixbld = 350;
 
       # Necessary for using flakes on this system.
       nix.settings = {
@@ -161,6 +163,7 @@
         # Performance optimizations
         http-connections = 128;
         max-jobs = "auto";
+        download-buffer-size = 134217728; # 128 MB (default is 64 MB)
       };
 
       nix.optimise.automatic = true;
@@ -173,6 +176,7 @@
 
       # Used for backwards compatibility, please read the changelog before changing.
       # $ darwin-rebuild changelog
+
       system.stateVersion = 5;
 
       # Primary user for user-specific settings
