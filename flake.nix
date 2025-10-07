@@ -49,6 +49,7 @@
           # system info
           fastfetch
           cpufetch
+          nerdfetch
 
           # activity monitoring
           htop
@@ -71,10 +72,20 @@
           fira-code-symbols
           jetbrains-mono
           julia-mono
+
+          # nerd fonts
+          nerd-fonts.fira-code
+          nerd-fonts.jetbrains-mono
+          nerd-fonts.meslo-lg
+          nerd-fonts.inconsolata
+
       ];
 
       # Don't manage PAM files (managed by IT)
       system.activationScripts.pam.text = lib.mkForce "";
+
+      # Enable TouchID for sudo
+      security.pam.services.sudo_local.touchIdAuth = true;
 
       # Set the primary user for system defaults
       system.primaryUser = "Erik.kiebe";
@@ -83,8 +94,8 @@
       system.defaults = {
         NSGlobalDomain = {
           # Keyboard responsiveness
-          InitialKeyRepeat = 10;
-          KeyRepeat = 1;
+          InitialKeyRepeat = 100;
+          KeyRepeat = 10;
           ApplePressAndHoldEnabled = false;
 
           # Disable smart text substitutions
@@ -178,9 +189,6 @@
       # $ darwin-rebuild changelog
 
       system.stateVersion = 5;
-
-      # Primary user for user-specific settings
-      system.primaryUser = "Erik.kiebe";
 
       # The platform the configuration will be used on.
       nixpkgs.hostPlatform = "aarch64-darwin";
