@@ -94,8 +94,8 @@
       system.defaults = {
         NSGlobalDomain = {
           # Keyboard responsiveness
-          InitialKeyRepeat = 100;
-          KeyRepeat = 10;
+          InitialKeyRepeat = 20;
+          KeyRepeat = 2;
           ApplePressAndHoldEnabled = false;
 
           # Disable smart text substitutions
