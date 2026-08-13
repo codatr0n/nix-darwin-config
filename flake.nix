@@ -78,8 +78,82 @@
           nerd-fonts.jetbrains-mono
           nerd-fonts.meslo-lg
           nerd-fonts.inconsolata
+          nerd-fonts.hack
 
       ];
+
+      homebrew = {
+        enable = true;
+
+        taps = [
+          "can1357/tap"
+          "jotta/cli"
+          "oven-sh/bun"
+        ];
+
+        brews = [
+          "antidote"
+          "git"
+          "gh"
+          "git-lfs"
+          "go"
+          "helix"
+          "hf"
+          "jotta/cli/jotta-cli"
+          "llmfit"
+          "ollama"
+          "opencode"
+          "openjdk@17"
+          "oven-sh/bun/bun"
+          "can1357/tap/omp"
+          "pipx"
+          "pnpm"
+          "python@3.9"
+          "python@3.12"
+          "rtk"
+          "ccusage"
+          "codeburn"
+          "cloud-sql-proxy"
+          "colima"
+          "docker"
+          "docker-buildx"
+          "starship"
+          "stow"
+          "syncthing"
+          "tailscale"
+          "terraform"
+          "uv"
+          "zoxide"
+          "fzf"
+        ];
+
+        casks = [
+          "claude"
+          "claude-code@latest"
+          "copilot-cli"
+          "warp"
+          "ghostty"
+          "discord"
+          "telegram"
+          "spotify"
+          "drawio"
+          "supacode"
+          "handy"
+          "dropbox"
+          "jottacloud"
+          "filen"
+          "gcloud-cli"
+          "corretto@21"
+          "ollama-app"
+          "syncthing-app"
+        ];
+
+        onActivation = {
+          autoUpdate = true;
+          upgrade = true;
+          cleanup = "uninstall";
+        };
+      };
 
       # Don't manage PAM files (managed by IT)
       system.activationScripts.pam.text = lib.mkForce "";
