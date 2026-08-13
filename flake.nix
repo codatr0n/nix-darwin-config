@@ -81,9 +81,9 @@
         enable = true;
 
         taps = [
-          "can1357/tap"
-          "jotta/cli"
-          "oven-sh/bun"
+          { name = "can1357/tap"; trusted = true; }
+          { name = "jotta/cli"; trusted = true; }
+          { name = "oven-sh/bun"; trusted = true; }
         ];
 
         brews = [
