@@ -31,6 +31,15 @@ curl --proto '=https' --tlsv1.2 -sSf -L https://install.determinate.systems/nix 
 nix flake init -t nix-darwin
 ```
 
+#### install Homebrew (required before first run)
+This flake manages Homebrew *packages* (via nix-darwin's `homebrew` module), but not
+the Homebrew *installation* itself. On a new machine, install Homebrew by hand first:
+```bash
+/bin/bash -c "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/HEAD/install.sh)"
+```
+Once `brew` is on your `$PATH`, `darwin-rebuild switch` will tap/install/upgrade and
+prune all the brews and casks declared in `flake.nix` for you automatically.
+
 #### first run of nix flake
 ```bash
 nix run nix-darwin -- switch --flake .

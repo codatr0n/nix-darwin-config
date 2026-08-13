@@ -6,29 +6,26 @@
     nix-darwin.url = "github:nix-darwin/nix-darwin/master";
     nix-darwin.inputs.nixpkgs.follows = "nixpkgs";
 
-    # nix-homebrew.url = "github:zhaofengli-wip/nix-homebrew";
-    # homebrew-core = { url = "github:homebrew/homebrew-core"; flake = false; };
-    # homebrew-cask = { url = "github:homebrew/homebrew-cask"; flake = false; };
-    # homebrew-bundle = { url = "github:homebrew/homebrew-bundle"; flake = false; };
-
-    # home-manager.url = "github:nix-community/home-manager/release-24.11";
-    # home-manager.inputs.nixpkgs.follows = "nixpkgs";
   };
 
   outputs = { self, nixpkgs, nix-darwin, ... }:
   let
-    pkgs = nixpkgs.legacyPackages.aarch64-darwin;
-  in
-  let
+    system = "aarch64-darwin";
+
+    pkgs = import nixpkgs {
+      inherit system;
+      config = {
+        allowUnfree = true;
+        allowUnsupportedSystem = true;
+      };
+    };
+
     configuration = { pkgs, lib, ... }: {
       # List packages installed in system profile. To search by name, run:
       # $ nix-env -qaP | grep wget
 
       environment.systemPackages = with pkgs;
         [
-          # desktop applications
-          google-chrome
-
           # essenstials
           wget
           bat
@@ -44,7 +41,6 @@
           p7zip
           tldr
           eza
-          yt-dlp
 
           # system info
           fastfetch
@@ -61,7 +57,6 @@
           gh            # GitHub CLI
           glab         # GitLab CLI
           opentofu
-          hcloud        # Hetzner Cloud CLI
         ];
 
       fonts.packages = with pkgs; [
@@ -78,8 +73,110 @@
           nerd-fonts.jetbrains-mono
           nerd-fonts.meslo-lg
           nerd-fonts.inconsolata
+          nerd-fonts.hack
 
       ];
+
+      homebrew = {
+        enable = true;
+
+        taps = [
+          { name = "can1357/tap"; trusted = true; }
+          { name = "jotta/cli"; trusted = true; }
+          { name = "oven-sh/bun"; trusted = true; }
+        ];
+
+        brews = [
+          # shell essentials
+          "antidote"
+          "starship"
+          "stow"
+          "zoxide"
+          "fzf"
+
+          # development
+          "git"
+          "gh"
+          "git-lfs"
+          "go"
+          "helix"
+          "terraform"
+          "uv"
+          "pnpm"
+          "pipx"
+
+          # language runtimes
+          "openjdk@17"
+          "python@3.9"
+          "python@3.12"
+          "oven-sh/bun/bun"
+
+          # AI / ML tooling
+          "hf"
+          "llmfit"
+          "ollama"
+          "opencode"
+          "rtk"
+          "ccusage"
+          "codeburn"
+          "can1357/tap/omp"
+
+          # cloud & containers
+          "cloud-sql-proxy"
+          "colima"
+          "docker"
+          "docker-buildx"
+
+          # cloud storage
+          "jotta/cli/jotta-cli"
+
+          # background services
+          "syncthing"
+          "tailscale"
+        ];
+
+        casks = [
+          # AI tools
+          "claude"
+          "claude-code@latest"
+          "copilot-cli"
+          "ollama-app"
+
+          # terminals
+          "warp"
+          "ghostty"
+
+          # communication
+          "discord"
+          "telegram"
+
+          # media
+          "spotify"
+
+          # productivity & creative
+          "drawio"
+          "supacode"
+          "handy"
+
+          # cloud storage
+          "dropbox"
+          "jottacloud"
+          "filen"
+
+          # cloud & infra
+          "gcloud-cli"
+          "corretto@21"
+
+          # background services
+          "syncthing-app"
+        ];
+
+        onActivation = {
+          autoUpdate = true;
+          upgrade = true;
+          cleanup = "uninstall";
+        };
+      };
 
       # Don't manage PAM files (managed by IT)
       system.activationScripts.pam.text = lib.mkForce "";
@@ -147,8 +244,8 @@
 
 
       # Determinate uses its own daemon to manage the Nix installation that
-      # conflicts with nix-darwin’s native Nix management.
-      # To turn off nix-darwin’s management of the Nix installation, set:
+      # conflicts with nix-darwin's native Nix management.
+      # To turn off nix-darwin's management of the Nix installation, set:
       # nix.enable = false;
       # This will allow you to use nix-darwin with Determinate
       nix.enable = true;      # Fix GID mismatch for nixbld group
@@ -189,15 +286,6 @@
       # $ darwin-rebuild changelog
 
       system.stateVersion = 5;
-
-      # The platform the configuration will be used on.
-      nixpkgs.hostPlatform = "aarch64-darwin";
-
-      # allow proprietary software
-      nixpkgs.config.allowUnfree = true;
-
-      # allow packages for unsupported architectures
-      nixpkgs.config.allowUnsupportedSystem = true;
     };
   in
   {
@@ -207,6 +295,10 @@
 
       modules = [
         configuration
+        # Inject the pre-built pkgs (with overlays applied) into the module system.
+        # nixpkgs.config, nixpkgs.overlays, and nixpkgs.hostPlatform must NOT be
+        # set alongside nixpkgs.pkgs — they are folded into the import above.
+        { nixpkgs.pkgs = pkgs; }
       ];
     };
   };
