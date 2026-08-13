@@ -92,59 +92,87 @@
         ];
 
         brews = [
+          # shell essentials
           "antidote"
+          "starship"
+          "stow"
+          "zoxide"
+          "fzf"
+
+          # development
           "git"
           "gh"
           "git-lfs"
           "go"
           "helix"
+          "terraform"
+          "uv"
+          "pnpm"
+          "pipx"
+
+          # language runtimes
+          "openjdk@17"
+          "python@3.9"
+          "python@3.12"
+          "oven-sh/bun/bun"
+
+          # AI / ML tooling
           "hf"
-          "jotta/cli/jotta-cli"
           "llmfit"
           "ollama"
           "opencode"
-          "openjdk@17"
-          "oven-sh/bun/bun"
-          "can1357/tap/omp"
-          "pipx"
-          "pnpm"
-          "python@3.9"
-          "python@3.12"
           "rtk"
           "ccusage"
           "codeburn"
+          "can1357/tap/omp"
+
+          # cloud & containers
           "cloud-sql-proxy"
           "colima"
           "docker"
           "docker-buildx"
-          "starship"
-          "stow"
+
+          # cloud storage
+          "jotta/cli/jotta-cli"
+
+          # background services
           "syncthing"
           "tailscale"
-          "terraform"
-          "uv"
-          "zoxide"
-          "fzf"
         ];
 
         casks = [
+          # AI tools
           "claude"
           "claude-code@latest"
           "copilot-cli"
+          "ollama-app"
+
+          # terminals
           "warp"
           "ghostty"
+
+          # communication
           "discord"
           "telegram"
+
+          # media
           "spotify"
+
+          # productivity & creative
           "drawio"
           "supacode"
           "handy"
+
+          # cloud storage
           "dropbox"
           "jottacloud"
           "filen"
+
+          # cloud & infra
           "gcloud-cli"
           "corretto@21"
-          "ollama-app"
+
+          # background services
           "syncthing-app"
         ];
 
