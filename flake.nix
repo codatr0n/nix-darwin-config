@@ -96,10 +96,8 @@
 
           # development
           "git"
-          "gh"
           "git-lfs"
           "go"
-          "helix"
           "terraform"
           "uv"
           "pnpm"
@@ -107,8 +105,8 @@
 
           # language runtimes
           "openjdk@17"
-          "python@3.9"
           "python@3.12"
+          "python@3.14"
           "oven-sh/bun/bun"
 
           # AI / ML tooling
@@ -116,14 +114,13 @@
           "llmfit"
           "ollama"
           "opencode"
-          "rtk"
           "ccusage"
           "codeburn"
-          "can1357/tap/omp"
+          "can1357/tap/omp" # oh my pi
 
           # cloud & containers
           "cloud-sql-proxy"
-          "colima"
+          "colima" # docker alternative for macOS
           "docker"
           "docker-buildx"
 
@@ -132,19 +129,23 @@
 
           # background services
           "syncthing"
-          "tailscale"
+        #   "tailscale"
         ];
 
         casks = [
           # AI tools
-          "claude"
+          "claude" # Claude Desktop
           "claude-code@latest"
           "copilot-cli"
           "ollama-app"
+          "supacode"
 
           # terminals
           "warp"
           "ghostty"
+
+          # browsers
+          "firefox"
 
           # communication
           "discord"
@@ -155,26 +156,46 @@
 
           # productivity & creative
           "drawio"
-          "supacode"
           "handy"
+          "marta"
+          "pomatez"
+          "markedit"
+          "joplin"
 
-          # cloud storage
+          # file syncing
           "dropbox"
           "jottacloud"
           "filen"
+          "syncthing-app"
+
+          # security
+          "bitwarden"
+
+          # remote access & networking
+          "rustdesk"
+          "tailscale-app"
+
+          # archive utilities
+          "keka"
+          "the-unarchiver"
+
+          # 3D printing
+          "elegoo-slicer"
+          "orcaslicer"
+
+          # development
+          "visual-studio-code"
 
           # cloud & infra
           "gcloud-cli"
           "corretto@21"
-
-          # background services
-          "syncthing-app"
         ];
 
         onActivation = {
           autoUpdate = true;
           upgrade = true;
           cleanup = "uninstall";
+          extraFlags = [ "--verbose" ];
         };
       };
 
