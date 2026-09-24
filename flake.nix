@@ -57,6 +57,7 @@
           gh            # GitHub CLI
           glab         # GitLab CLI
           opentofu
+          shellcheck
         ];
 
       fonts.packages = with pkgs; [
