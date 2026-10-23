@@ -103,6 +103,12 @@
           "uv"
           "pnpm"
           "pipx"
+          "lazygit"
+          "gnu-tar"
+          "krb5"
+          "postgresql@16"
+          "fresh-editor"
+          "herdr"
 
           # language runtimes
           "openjdk@17"
@@ -124,6 +130,7 @@
           "colima" # docker alternative for macOS
           "docker"
           "docker-buildx"
+          "docker-compose"
 
           # cloud storage
           "jotta/cli/jotta-cli"
@@ -183,6 +190,9 @@
           # 3D printing
           "elegoo-slicer"
           "orcaslicer"
+
+          # games
+          "prismlauncher"
 
           # development
           "visual-studio-code"
